@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C3A9ED0B2E55345200E3815C /* ElevenLabs in Frameworks */ = {isa = PBXBuildFile; productRef = C3A9ED0A2E55345200E3815C /* ElevenLabs */; };
+		C3A9ED792E564BC600E3815C /* SplineRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = C3A9ED782E564BC600E3815C /* SplineRuntime */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C3A9ED792E564BC600E3815C /* SplineRuntime in Frameworks */,
 				C3A9ED0B2E55345200E3815C /* ElevenLabs in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -71,6 +73,7 @@
 			name = BahnCy;
 			packageProductDependencies = (
 				C3A9ED0A2E55345200E3815C /* ElevenLabs */,
+				C3A9ED782E564BC600E3815C /* SplineRuntime */,
 			);
 			productName = BahnCy;
 			productReference = C3A9ECFB2E5533CB00E3815C /* BahnCy.app */;
@@ -102,6 +105,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				C3A9ED092E55345200E3815C /* XCRemoteSwiftPackageReference "elevenlabs-swift-sdk" */,
+				C3A9ED772E564BC600E3815C /* XCRemoteSwiftPackageReference "spline-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C3A9ECFC2E5533CB00E3815C /* Products */;
@@ -347,6 +351,14 @@
 				kind = branch;
 			};
 		};
+		C3A9ED772E564BC600E3815C /* XCRemoteSwiftPackageReference "spline-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/splinetool/spline-ios.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -354,6 +366,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C3A9ED092E55345200E3815C /* XCRemoteSwiftPackageReference "elevenlabs-swift-sdk" */;
 			productName = ElevenLabs;
+		};
+		C3A9ED782E564BC600E3815C /* SplineRuntime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3A9ED772E564BC600E3815C /* XCRemoteSwiftPackageReference "spline-ios" */;
+			productName = SplineRuntime;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

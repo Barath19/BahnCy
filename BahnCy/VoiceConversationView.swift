@@ -3,261 +3,175 @@ import ElevenLabs
 
 struct VoiceConversationView: View {
     @StateObject private var viewModel = VoiceConversationViewModel()
-    @State private var agentId = ""
-    @State private var messageText = ""
-    @State private var showingAgentIdAlert = false
+    @State private var agentId = "agent_4301k204f3fgfgmte77ezfxznqkz"
     
     var body: some View {
-        NavigationView {
-            VStack {
-                if !viewModel.isConnected && !viewModel.isLoading {
-                    startConversationView
-                } else {
-                    voiceConversationView
-                }
-            }
-            .navigationTitle("Voice AI Chat")
-            .alert("Enter Agent ID", isPresented: $showingAgentIdAlert) {
-                TextField("Agent ID", text: $agentId)
-                Button("Start Voice Chat") {
-                    Task {
-                        await viewModel.startConversation(agentId: agentId)
-                    }
-                }
-                Button("Cancel", role: .cancel) { }
-            } message: {
-                Text("Please enter your ElevenLabs Agent ID to start a voice conversation.")
-            }
-            .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
-                Button("OK") {
-                    viewModel.errorMessage = nil
-                }
-            } message: {
-                if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage)
-                }
-            }
-        }
-    }
-    
-    private var startConversationView: some View {
-        VStack(spacing: 24) {
-            // Voice-focused icon
-            Image(systemName: "waveform.circle.fill")
-                .font(.system(size: 100))
-                .foregroundColor(.blue)
-                .symbolEffect(.pulse)
+        VStack(spacing: 40) {
+            Spacer()
             
-            VStack(spacing: 12) {
-                Text("Start Voice AI Chat")
-                    .font(.title)
-                    .fontWeight(.bold)
-                
-                Text("Talk naturally with your AI assistant")
-                    .font(.headline)
-                    .foregroundColor(.secondary)
-                
-                Text("• Speak and the AI will respond with voice\n• Natural conversation flow\n• Real-time audio streaming")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-            }
+            // Orb animation
+            OrbView(
+                isConnected: viewModel.isConnected,
+                isAgentSpeaking: viewModel.agentIsSpeaking
+            )
+            .frame(width: 200, height: 200)
             
-            VStack(spacing: 16) {
-                TextField("Enter Agent ID", text: $agentId)
-                    .textFieldStyle(.roundedBorder)
-                    .autocapitalization(.none)
-                    .disableAutocorrection(true)
-                
-                Button("🎤 Start Voice Conversation") {
-                    if agentId.isEmpty {
-                        showingAgentIdAlert = true
-                    } else {
-                        Task {
-                            await viewModel.startConversation(agentId: agentId)
-                        }
-                    }
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(viewModel.isLoading)
-                .font(.headline)
-            }
-            
-            if viewModel.isLoading {
-                HStack {
-                    ProgressView()
-                    Text("Connecting to voice AI...")
-                }
-                .padding()
-            }
-        }
-        .padding(32)
-    }
-    
-    private var voiceConversationView: some View {
-        VStack(spacing: 0) {
-            voiceConversationHeader
-            messagesList
-            voiceControlsView
-        }
-    }
-    
-    private var voiceConversationHeader: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Circle()
-                        .fill(viewModel.isConnected ? Color.green : Color.red)
-                        .frame(width: 8, height: 8)
-                    
-                    Text(viewModel.isConnected ? "Voice AI Connected" : "Disconnected")
-                        .font(.headline)
-                        .foregroundColor(viewModel.isConnected ? .green : .red)
-                }
-                
-                Text("Speak naturally or type messages")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
+            // Status text
+            Text(viewModel.isConnected ? "Listening..." : "Ready to talk")
+                .font(.title2)
+                .foregroundColor(viewModel.isConnected ? .green : .primary)
             
             Spacer()
             
-            Button("End Call") {
+            // Control button
+            Button(action: {
                 Task {
-                    await viewModel.endConversation()
-                }
-            }
-            .buttonStyle(.bordered)
-            .foregroundColor(.red)
-        }
-        .padding()
-        .background(Color(.systemGroupedBackground))
-    }
-    
-    private var messagesList: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 12) {
-                    if viewModel.messages.isEmpty {
-                        VStack(spacing: 16) {
-                            Image(systemName: "mic.circle")
-                                .font(.system(size: 48))
-                                .foregroundColor(.blue.opacity(0.6))
-                            
-                            Text("Start speaking or type a message below")
-                                .font(.headline)
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.center)
-                            
-                            Text("Your voice conversation will appear here")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding(40)
+                    if viewModel.isConnected {
+                        await viewModel.endConversation()
                     } else {
-                        ForEach(viewModel.messages.indices, id: \.self) { index in
-                            let message = viewModel.messages[index]
-                            VoiceMessageBubble(message: message)
-                                .id(index)
-                        }
+                        await viewModel.startConversation(agentId: agentId)
                     }
                 }
-                .padding()
-            }
-            .onReceive(viewModel.$messages) { messages in
-                if let lastIndex = messages.indices.last {
-                    withAnimation {
-                        proxy.scrollTo(lastIndex, anchor: .bottom)
+            }) {
+                HStack {
+                    if viewModel.isConnected {
+                        Image(systemName: "phone.down.fill")
+                        Text("End Call")
+                    } else {
+                        Image(systemName: "waveform")
+                        Text("Start Voice Chat")
                     }
                 }
+                .font(.headline)
+                .foregroundColor(.white)
+                .padding(.horizontal, 40)
+                .padding(.vertical, 16)
+                .background(viewModel.isConnected ? Color.red : Color.blue)
+                .clipShape(Capsule())
             }
-        }
-    }
-    
-    private var voiceControlsView: some View {
-        VStack(spacing: 16) {
-            // Voice activity indicator
-            HStack {
-                Image(systemName: viewModel.isMuted ? "mic.slash.circle.fill" : "mic.circle.fill")
-                    .font(.system(size: 24))
-                    .foregroundColor(viewModel.isMuted ? .red : .blue)
-                
-                Text(viewModel.isMuted ? "Muted" : "Listening")
-                    .font(.headline)
-                    .foregroundColor(viewModel.isMuted ? .red : .blue)
-                
-                Spacer()
-                
-                Button(action: viewModel.toggleMute) {
-                    Image(systemName: viewModel.isMuted ? "mic.slash.fill" : "mic.fill")
-                        .font(.system(size: 20))
-                        .foregroundColor(.white)
-                        .padding(12)
-                        .background(viewModel.isMuted ? Color.red : Color.blue)
-                        .clipShape(Circle())
-                }
+            .disabled(viewModel.isLoading)
+            
+            if viewModel.isLoading {
+                ProgressView("Connecting...")
+                    .padding(.top)
             }
             
-            // Text input as backup
-            HStack {
-                TextField("Type a message...", text: $messageText)
-                    .textFieldStyle(.roundedBorder)
-                
-                Button("Send") {
-                    if !messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        viewModel.sendTextMessage(messageText)
-                        messageText = ""
-                    }
-                }
-                .disabled(messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !viewModel.isConnected)
-            }
+            Spacer()
         }
         .padding()
-        .background(Color(.systemGroupedBackground))
+        .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
+            Button("OK") {
+                viewModel.errorMessage = nil
+            }
+        } message: {
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+            }
+        }
     }
 }
 
-struct VoiceMessageBubble: View {
-    let message: VoiceMessage
+struct OrbView: View {
+    let isConnected: Bool
+    let isAgentSpeaking: Bool
+    
+    @State private var pulseAnimation: CGFloat = 1.0
+    @State private var rotationAnimation: Double = 0
+    @State private var glowAnimation: CGFloat = 0.3
     
     var body: some View {
-        HStack {
-            if message.isFromUser {
-                Spacer()
-            }
+        ZStack {
+            // Outer glow ring
+            Circle()
+                .stroke(
+                    RadialGradient(
+                        gradient: Gradient(colors: [
+                            Color.cyan.opacity(glowAnimation),
+                            Color.blue.opacity(glowAnimation * 0.5),
+                            Color.clear
+                        ]),
+                        center: .center,
+                        startRadius: 60,
+                        endRadius: 100
+                    ),
+                    lineWidth: 4
+                )
+                .scaleEffect(pulseAnimation)
+                .opacity(isConnected ? 1.0 : 0.3)
             
-            VStack(alignment: message.isFromUser ? .trailing : .leading, spacing: 4) {
-                HStack {
-                    if !message.isFromUser {
-                        Image(systemName: "brain.head.profile")
-                            .foregroundColor(.blue)
-                    }
-                    
-                    Text(message.displayContent)
-                        .padding(12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(message.isFromUser ? Color.blue : Color(.systemGray5))
-                        )
-                        .foregroundColor(message.isFromUser ? .white : .primary)
-                    
-                    if message.isFromUser {
-                        Image(systemName: "person.crop.circle.fill")
-                            .foregroundColor(.blue)
-                    }
-                }
-                
-                Text(message.isFromUser ? "You" : "AI Assistant")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
+            // Main orb
+            Circle()
+                .fill(
+                    RadialGradient(
+                        gradient: Gradient(colors: [
+                            Color.white.opacity(0.9),
+                            Color.cyan.opacity(0.8),
+                            Color.blue.opacity(0.6),
+                            Color.indigo.opacity(0.4)
+                        ]),
+                        center: UnitPoint(x: 0.3, y: 0.3),
+                        startRadius: 20,
+                        endRadius: 80
+                    )
+                )
+                .frame(width: 120, height: 120)
+                .shadow(color: Color.cyan.opacity(isAgentSpeaking ? 0.8 : 0.4), radius: isAgentSpeaking ? 20 : 10)
+                .scaleEffect(pulseAnimation)
+                .rotationEffect(.degrees(rotationAnimation))
+                .opacity(isConnected ? 1.0 : 0.5)
             
-            if !message.isFromUser {
-                Spacer()
-            }
+            // Inner sparkle
+            Circle()
+                .fill(Color.white.opacity(0.9))
+                .frame(width: 8, height: 8)
+                .offset(x: -20, y: -20)
+                .rotationEffect(.degrees(rotationAnimation * 2))
+                .opacity(isConnected ? 1.0 : 0.3)
+        }
+        .onAppear {
+            startAnimations()
+        }
+        .onChange(of: isAgentSpeaking) { _, _ in
+            updateAnimations()
+        }
+    }
+    
+    private func startAnimations() {
+        // Rotation animation
+        withAnimation(
+            .linear(duration: 20)
+            .repeatForever(autoreverses: false)
+        ) {
+            rotationAnimation = 360
+        }
+        
+        updateAnimations()
+    }
+    
+    private func updateAnimations() {
+        // Pulse animation
+        let pulseDuration = isAgentSpeaking ? 0.6 : 1.5
+        let pulseScale = isAgentSpeaking ? 1.2 : 1.1
+        
+        withAnimation(
+            .easeInOut(duration: pulseDuration)
+            .repeatForever(autoreverses: true)
+        ) {
+            pulseAnimation = pulseScale
+        }
+        
+        // Glow animation
+        let glowIntensity = isAgentSpeaking ? 0.8 : 0.3
+        
+        withAnimation(
+            .easeInOut(duration: pulseDuration)
+            .repeatForever(autoreverses: true)
+        ) {
+            glowAnimation = glowIntensity
         }
     }
 }
+
 
 #Preview {
     VoiceConversationView()

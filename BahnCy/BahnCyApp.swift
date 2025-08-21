@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AppIntents
 
 @main
 struct BahnCyApp: App {
@@ -13,5 +14,9 @@ struct BahnCyApp: App {
         WindowGroup {
             ContentView()
         }
+    }
+    
+    init() {
+        BahnCyShortcuts.updateAppShortcutParameters()
     }
 }

@@ -1,5 +1,5 @@
 {
-  "originHash" : "c5f0a90d5d8853f60c787b94fc426567c28d23873b20be5b38fd5ebfb35e9eee",
+  "originHash" : "ac8049260d12e3e188e17bf1007cd31651d78628d1f7a285ef37ec81da40fd25",
   "pins" : [
     {
       "identity" : "client-sdk-swift",
@@ -17,6 +17,15 @@
       "state" : {
         "branch" : "main",
         "revision" : "76d0f8aa2abfcab8a1717744c340ae5878f9323b"
+      }
+    },
+    {
+      "identity" : "spline-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/splinetool/spline-ios.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "20024388b82bec584e7d4415fbe819771e8f06a3"
       }
     },
     {
