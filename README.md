@@ -1,4 +1,5 @@
 # BahnCy - AI Voice Agent for Berlin 🚇🐻
+![IMG_F087B0158526-1](https://github.com/user-attachments/assets/b877a5fa-34ce-4e51-bfb0-ee1e03aea7c3)
 
 ![BahnCy Demo](https://img.shields.io/badge/iOS-17%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![License](https://img.shields.io/badge/License-MIT-green)
 
@@ -12,6 +13,8 @@
 - **🚇 Transport Intelligence** - Berlin public transport information via AI agent
 
 ## 🎯 Demo
+
+ **📹 Watch the Demo:** [BahnCy in Action](https://youtu.be/s9hk1tRZDp8)
 
 **Try the AI Agent:** [Talk to BahnCy Agent](https://elevenlabs.io/app/conversational-ai/talk-to/agent_4301k204f3fgfgmte77ezfxznqkz)
 
